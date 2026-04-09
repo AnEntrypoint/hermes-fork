@@ -257,6 +257,13 @@ PROVIDER_REGISTRY: Dict[str, ProviderConfig] = {
         inference_base_url="acp://claude-agent",
         base_url_env_var="CLAUDE_AGENT_ACP_BASE_URL",
     ),
+    "claude-code-acp": ProviderConfig(
+        id="claude-code-acp",
+        name="Claude Code ACP",
+        auth_type="acp",
+        inference_base_url="acp://claude-code",
+        base_url_env_var="CLAUDE_CODE_ACP_BASE_URL",
+    ),
 }
 
 
@@ -841,6 +848,7 @@ def resolve_provider(
         "github-copilot-acp": "copilot-acp", "copilot-acp-agent": "copilot-acp",
         "acp-llm": "llm-acp", "llmacp": "llm-acp",
         "claude-acp": "claude-agent-acp", "claude-agent": "claude-agent-acp",
+        "claude-code-acp": "claude-code-acp", "cc-acp": "claude-code-acp",
         "aigateway": "ai-gateway", "vercel": "ai-gateway", "vercel-ai-gateway": "ai-gateway",
         "opencode": "opencode-zen", "zen": "opencode-zen",
         "qwen-portal": "qwen-oauth", "qwen-cli": "qwen-oauth", "qwen-oauth": "qwen-oauth",
@@ -2374,7 +2382,13 @@ def resolve_acp_provider_credentials(provider_id: str) -> Dict[str, Any]:
     if not base_url:
         base_url = pconfig.inference_base_url
 
-    if provider_id == "claude-agent-acp":
+    if provider_id == "claude-code-acp":
+        command = os.getenv("CLAUDE_CODE_ACP_COMMAND", "").strip() or "claude"
+        raw_args = os.getenv("CLAUDE_CODE_ACP_ARGS", "").strip()
+        args = shlex.split(raw_args) if raw_args else [
+            "--print", "--output-format", "stream-json", "--verbose", "--dangerously-skip-permissions", "--no-session-persistence"
+        ]
+    elif provider_id == "claude-agent-acp":
         command = os.getenv("CLAUDE_AGENT_ACP_COMMAND", "").strip() or "claude-agent-acp"
         raw_args = os.getenv("CLAUDE_AGENT_ACP_ARGS", "").strip()
         args = shlex.split(raw_args) if raw_args else ["--stdio"]

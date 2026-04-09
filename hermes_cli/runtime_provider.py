@@ -728,7 +728,7 @@ def resolve_runtime_provider(
             "requested_provider": requested_provider,
         }
 
-    if provider in ("llm-acp", "claude-agent-acp"):
+    if provider in ("llm-acp", "claude-agent-acp", "claude-code-acp"):
         creds = resolve_acp_provider_credentials(provider)
         return {
             "provider": provider,
